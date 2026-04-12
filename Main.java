@@ -15,12 +15,12 @@ public class Main {
         frame.setLayout(new GridLayout(1, 3));
         frame.setMinimumSize(new Dimension(1800, 900));
 
-        int[] arr = ArrGen.generateArray(100);
-        BubbleSortPanel bpanel = new BubbleSortPanel(arr);
+        int[] arr = ArrGen.generateArray(1000);
+        BubbleSortPanel bpanel = new BubbleSortPanel(arr.clone());
         frame.add(bpanel);
-        MergeSortPanel mpanel = new MergeSortPanel(arr);
+        MergeSortPanel mpanel = new MergeSortPanel(arr.clone());
         frame.add(mpanel);
-        QuickSortPanel qpanel = new QuickSortPanel(arr);
+        QuickSortPanel qpanel = new QuickSortPanel(arr.clone());
         frame.add(qpanel);
 
         bpanel.startSorting();

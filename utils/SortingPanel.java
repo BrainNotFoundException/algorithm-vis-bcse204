@@ -22,7 +22,7 @@ public abstract class SortingPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        int width = getWidth() / arr.length;
+        int width = Math.max(getWidth()/arr.length, 1);
 
         for (int i = 0; i < arr.length; i++) {
             g.fillRect(i * width, getHeight() - arr[i], width, arr[i]);

@@ -8,7 +8,7 @@ public interface ArrGen {
         Random rand = new Random();
 
         for(int i=0; i<size; i++){
-            arr[i] = rand.nextInt(size*10)+1;
+            arr[i] = rand.nextInt(1000)+1;
         }
 
         return arr;
