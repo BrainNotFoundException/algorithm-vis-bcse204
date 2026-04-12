@@ -16,9 +16,16 @@ public class Main {
         frame.setMinimumSize(new Dimension(1800, 900));
 
         int[] arr = ArrGen.generateArray(100);
-        frame.add(new BubbleSortPanel(arr));
-        frame.add(new MergeSortPanel(arr));
-        frame.add(new QuickSortPanel(arr));
+        BubbleSortPanel bpanel = new BubbleSortPanel(arr);
+        frame.add(bpanel);
+        MergeSortPanel mpanel = new MergeSortPanel(arr);
+        frame.add(mpanel);
+        QuickSortPanel qpanel = new QuickSortPanel(arr);
+        frame.add(qpanel);
+
+        bpanel.startSorting();
+        mpanel.startSorting();
+        qpanel.startSorting();
 
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
