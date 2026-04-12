@@ -249,7 +249,7 @@ public class Main {
         label.setForeground(Theme.BUTTON_FG);
         label.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 16));
 
-        JLabel timeLabel = new JLabel("Time Taken", SwingConstants.CENTER);
+        JLabel timeLabel = new JLabel("Time: Running...", SwingConstants.CENTER);
         timeLabel.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 16));
         timeLabel.setForeground(Theme.TIME_COLOR);
 

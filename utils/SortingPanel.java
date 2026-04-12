@@ -10,7 +10,7 @@ public abstract class SortingPanel extends JPanel {
     protected int[] arr;
     private int[] originalArr;
 
-    long startTime, endTime, runTime;
+    long startTime, endTime, runTime, pauseStart, pausedTime;
     JLabel timeLabel;
 
     private volatile boolean paused = false;
@@ -26,9 +26,25 @@ public abstract class SortingPanel extends JPanel {
         this.delayMs = ms;
     }
 
+    void updateTimeLabel() {
+        if (timeLabel != null) {
+
+            long timeSpentPaused = pausedTime;
+            if (paused && pauseStart != 0) {
+                timeSpentPaused += System.nanoTime() - pauseStart;
+            }
+            long updateTime = (System.nanoTime() - startTime - timeSpentPaused) / 1000000;
+
+            SwingUtilities.invokeLater(() -> {
+                timeLabel.setText("Time: " + updateTime + "ms");
+            });
+        }
+    }
+
     protected abstract void sort();
 
     protected void pause() {
+        updateTimeLabel();
         repaint();
         long target = System.currentTimeMillis() + delayMs;
         try {
@@ -64,7 +80,7 @@ public abstract class SortingPanel extends JPanel {
             sort();
             if (!stopRequested) {
                 endTime = System.nanoTime();
-                runTime = (endTime - startTime) / 1_000_000;
+                runTime = (endTime - startTime) / 1000000;
                 onSortingCompleted();
             }
         });
@@ -90,6 +106,15 @@ public abstract class SortingPanel extends JPanel {
     }
 
     public void setPaused(boolean p) {
+
+        if (p && !paused) {
+            pauseStart = System.nanoTime();
+        }
+
+        if (!p && paused) {
+            pausedTime += System.nanoTime() - pauseStart;
+        }
+
         this.paused = p;
     }
 
@@ -101,7 +126,7 @@ public abstract class SortingPanel extends JPanel {
         if (timeLabel != null) {
             SwingUtilities.invokeLater(()
                     -> {
-                timeLabel.setText("Total Time: " + runTime + "ms");
+                timeLabel.setText("Total Time: " + (runTime - pausedTime/1000000) + "ms");
             });
         }
     }
@@ -109,6 +134,8 @@ public abstract class SortingPanel extends JPanel {
     public SortingPanel(int[] arr) {
         this.arr = arr;
         this.originalArr = arr.clone();
+
+        this.pausedTime = 0;
     }
 
     public void resetAndStart(int[] newArr) {
