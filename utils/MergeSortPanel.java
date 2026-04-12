@@ -39,18 +39,17 @@ public class MergeSortPanel extends SortingPanel {
                 arr[k++] = R[j++];
             }
 
-            pause();
         }
 
         while (i < n1) {
             arr[k++] = L[i++];
-            pause();
         }
 
         while (j < n2) {
             arr[k++] = R[j++];
-            pause();
         }
+
+        pause();
     }
 
     @Override

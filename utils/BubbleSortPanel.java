@@ -14,9 +14,8 @@ public class BubbleSortPanel extends SortingPanel {
                     int temp = arr[j];
                     arr[j] = arr[j + 1];
                     arr[j + 1] = temp;
+                    pause();
                 }
-
-                pause();
 
             }
         }
