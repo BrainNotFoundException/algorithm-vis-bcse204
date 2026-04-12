@@ -9,4 +9,6 @@ public class Theme {
     public static final Color BUTTON_FG = Color.WHITE;
     public static final Color BORDER_COLOR = Color.DARK_GRAY;
 
+    public static final Color TIME_COLOR = Color.GREEN;
+
 }

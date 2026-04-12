@@ -63,7 +63,7 @@ public class Main {
         qpanel.startSorting();
     }
 
-    public static JPanel createCard(String title, JPanel panel) {
+    public static JPanel createCard(String title, SortingPanel panel) {
 
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(new Color(30, 30, 30));
@@ -77,8 +77,15 @@ public class Main {
         label.setForeground(Theme.BUTTON_FG);
         label.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 16));
 
+        JLabel timeLabel = new JLabel("Time Taken", SwingConstants.CENTER);
+        timeLabel.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 16));
+        timeLabel.setForeground(Theme.TIME_COLOR);
+
+        panel.setTimeLabel(timeLabel);
+
         card.add(label, BorderLayout.NORTH);
         card.add(panel, BorderLayout.CENTER);
+        card.add(timeLabel, BorderLayout.SOUTH);
 
         return card;
     }
