@@ -27,6 +27,8 @@ public class QuickSortPanel extends SortingPanel {
                 int temp = arr[i];
                 arr[i] = arr[j];
                 arr[j] = temp;
+
+                pause();
                 
             }
         }

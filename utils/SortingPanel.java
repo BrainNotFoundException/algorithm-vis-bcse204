@@ -12,7 +12,7 @@ public abstract class SortingPanel extends JPanel {
     protected void pause() {
         repaint();
         try {
-            Thread.sleep(100);
+            Thread.sleep(5);
         } catch (Exception e) {
             e.printStackTrace();
         }

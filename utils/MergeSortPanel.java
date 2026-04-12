@@ -35,21 +35,24 @@ public class MergeSortPanel extends SortingPanel {
         while (i < n1 && j < n2) {
             if (L[i] <= R[j]) {
                 arr[k++] = L[i++];
+                pause();
             } else {
                 arr[k++] = R[j++];
+                pause();
             }
 
         }
 
         while (i < n1) {
             arr[k++] = L[i++];
+            pause();
         }
 
         while (j < n2) {
             arr[k++] = R[j++];
+            pause();
         }
 
-        pause();
     }
 
     @Override
