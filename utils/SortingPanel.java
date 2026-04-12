@@ -8,65 +8,114 @@ import javax.swing.SwingUtilities;
 public abstract class SortingPanel extends JPanel {
 
     protected int[] arr;
+    private int[] originalArr;
 
-    long startTime;
-    long endTime;
-    long runTime;
-
+    long startTime, endTime, runTime;
     JLabel timeLabel;
+
+    private volatile boolean paused = false;
+    private volatile int delayMs = 5;
+    private volatile boolean stopRequested = false;
+    private Thread sortThread;
 
     public void setTimeLabel(JLabel timeLabel) {
         this.timeLabel = timeLabel;
+    }
+
+    public void setDelay(int ms) {
+        this.delayMs = ms;
     }
 
     protected abstract void sort();
 
     protected void pause() {
         repaint();
+        long target = System.currentTimeMillis() + delayMs;
         try {
-            Thread.sleep(5);
-        } catch (Exception e) {
-            e.printStackTrace();
+            while (System.currentTimeMillis() < target || paused) {
+                if (stopRequested) {
+                    return;
+                }
+                Thread.sleep(paused ? 50 : 1);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
+    }
+
+    protected boolean isStopped() {
+        return stopRequested;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         int width = Math.max(getWidth() / arr.length, 1);
-
         for (int i = 0; i < arr.length; i++) {
             g.fillRect(i * width, getHeight() - arr[i], width, arr[i]);
         }
     }
 
     public void startSorting() {
-        new Thread(() -> {
-
+        stopRequested = false;
+        paused = false;
+        sortThread = new Thread(() -> {
             startTime = System.nanoTime();
             sort();
-            endTime = System.nanoTime();
-            runTime = (endTime - startTime) / 1000000;
+            if (!stopRequested) {
+                endTime = System.nanoTime();
+                runTime = (endTime - startTime) / 1_000_000;
+                onSortingCompleted();
+            }
+        });
+        sortThread.setDaemon(true);
+        sortThread.start();
+    }
 
-            onSortingCompleted();
+    public void restart() {
+        stopRequested = true;
+        paused = false;
+        if (sortThread != null) {
+            sortThread.interrupt();
+            try {
+                sortThread.join(200);
+            } catch (InterruptedException ignored) {
+            }
+        }
+        arr = originalArr.clone();
+        if (timeLabel != null) {
+            SwingUtilities.invokeLater(() -> timeLabel.setText("Time Taken"));
+        }
+        repaint();
+    }
 
-        }).start();
+    public void setPaused(boolean p) {
+        this.paused = p;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 
     void onSortingCompleted() {
         if (timeLabel != null) {
-            SwingUtilities.invokeLater(() -> {
-                // long minutes = (long) runTime/(1000*60);
-                // long seconds = (long)(runTime/1000) - (minutes*60);
-                //timeLabel.setText("Total Time Taken: " + minutes + "mins and " + seconds + "s");
-                timeLabel.setText("Total Time Taken: " + runTime + "ms");
+            SwingUtilities.invokeLater(()
+                    -> {
+                timeLabel.setText("Total Time: " + runTime + "ms");
             });
         }
     }
 
     public SortingPanel(int[] arr) {
         this.arr = arr;
+        this.originalArr = arr.clone();
     }
 
+    public void resetAndStart(int[] newArr) {
+        restart();
+        this.arr = newArr.clone();
+        this.originalArr = newArr.clone();
+        repaint();
+        startSorting();
+    }
 }

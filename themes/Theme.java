@@ -11,4 +11,9 @@ public class Theme {
 
     public static final Color TIME_COLOR = Color.GREEN;
 
+    public static final Color FIELD_BG = new Color(40, 40, 40);
+    public static final Color ERROR_FG = new Color(220, 80, 60);
+    public static final Color TOOLBAR_BG = new Color(25, 25, 25);
+    public static final Color CARD_BG = new Color(30, 30, 30);
+
 }
