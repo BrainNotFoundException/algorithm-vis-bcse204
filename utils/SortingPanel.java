@@ -15,7 +15,7 @@ public abstract class SortingPanel extends JPanel {
 
     JLabel timeLabel;
 
-    public void setTimeLabel(JLabel timeLabel){
+    public void setTimeLabel(JLabel timeLabel) {
         this.timeLabel = timeLabel;
     }
 
@@ -47,19 +47,20 @@ public abstract class SortingPanel extends JPanel {
             startTime = System.nanoTime();
             sort();
             endTime = System.nanoTime();
-            runTime = (endTime - startTime)/1000000;
+            runTime = (endTime - startTime) / 1000000;
 
             onSortingCompleted();
 
         }).start();
     }
 
-    void onSortingCompleted(){
-        if(timeLabel!=null){
-            SwingUtilities.invokeLater(()->{
-                long minutes = (long) runTime/(1000*60);
-                long seconds = (long)(runTime/1000) - (minutes*60);
-                timeLabel.setText("Total Time Taken: " + minutes + "mins and " + seconds + "s");
+    void onSortingCompleted() {
+        if (timeLabel != null) {
+            SwingUtilities.invokeLater(() -> {
+                // long minutes = (long) runTime/(1000*60);
+                // long seconds = (long)(runTime/1000) - (minutes*60);
+                //timeLabel.setText("Total Time Taken: " + minutes + "mins and " + seconds + "s");
+                timeLabel.setText("Total Time Taken: " + runTime + "ms");
             });
         }
     }
