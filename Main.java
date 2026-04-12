@@ -10,6 +10,27 @@ public class Main {
 
         JFrame frame = new JFrame("Sorting Algorithm Visualizer");
 
+        int arrSize;
+        while (true) {
+            String input = JOptionPane.showInputDialog("Enter array size between 1 to 1500: ");
+            if (input == null) {
+                System.exit(0);
+            }
+
+            try {
+                arrSize = Integer.parseInt(input);
+                if (arrSize <= 0) {
+                    JOptionPane.showMessageDialog(null, "Please enter a positive integer.");
+                } else if (arrSize > 1500) {
+                    JOptionPane.showMessageDialog(null, "The value is too big, enter a smaller value.");
+                } else {
+                    break;
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Please enter a valid integer.");
+            }
+        }
+
         UIManager.put("Panel.background", Theme.BG_COLOR);
         UIManager.put("Button.background", Theme.BUTTON_BG);
         UIManager.put("Button.foreground", Theme.BUTTON_FG);
@@ -22,7 +43,7 @@ public class Main {
         container.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         container.setBackground(Theme.BG_COLOR);
 
-        int[] arr = ArrGen.generateArray(100);
+        int[] arr = ArrGen.generateArray(arrSize);
         BubbleSortPanel bpanel = new BubbleSortPanel(arr.clone());
         MergeSortPanel mpanel = new MergeSortPanel(arr.clone());
         QuickSortPanel qpanel = new QuickSortPanel(arr.clone());
