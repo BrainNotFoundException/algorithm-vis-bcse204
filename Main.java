@@ -13,14 +13,18 @@ public class Main {
     static BubbleSortPanel bpanel;
     static MergeSortPanel mpanel;
     static QuickSortPanel qpanel;
+    static HeapSortPanel hpanel;
+    static RadixSortPanel rpanel;
+    static ShellSortPanel spanel;
+    static CountingSortPanel cpanel;
     static JButton pauseBtn;
 
-    static JLabel[] statusLabels = new JLabel[3];
-    static JLabel[] timeLabels = new JLabel[3];
-    static JPanel[] rowPanels = new JPanel[3];
+    static JLabel[] statusLabels = new JLabel[7];
+    static JLabel[] timeLabels = new JLabel[7];
+    static JPanel[] rowPanels = new JPanel[7];
 
     static AtomicInteger finishCounter = new AtomicInteger(0);
-    static boolean[] finished = new boolean[3];
+    static boolean[] finished = new boolean[7];
 
     static Timer liveTimer;
 
@@ -190,6 +194,10 @@ public class Main {
         bpanel = new BubbleSortPanel(arr.clone());
         mpanel = new MergeSortPanel(arr.clone());
         qpanel = new QuickSortPanel(arr.clone());
+        hpanel = new HeapSortPanel(arr.clone());
+        rpanel = new RadixSortPanel(arr.clone());
+        spanel = new ShellSortPanel(arr.clone());
+        cpanel = new CountingSortPanel(arr.clone());
         bpanel.setVisible(false);
         mpanel.setVisible(false);
         qpanel.setVisible(false);
@@ -222,6 +230,10 @@ public class Main {
             bpanel.restart();
             mpanel.restart();
             qpanel.restart();
+            hpanel.restart();
+            rpanel.restart();
+            spanel.restart();
+            cpanel.restart();
             wireCallbacks();
             startAllSorting();
             startLiveTimer();
@@ -241,6 +253,10 @@ public class Main {
             bpanel.resetAndStart(fresh.clone());
             mpanel.resetAndStart(fresh.clone());
             qpanel.resetAndStart(fresh.clone());
+            hpanel.resetAndStart(fresh.clone());
+            rpanel.resetAndStart(fresh.clone());
+            spanel.resetAndStart(fresh.clone());
+            cpanel.resetAndStart(fresh.clone());
             wireCallbacks();
             startLiveTimer();
         });
@@ -250,6 +266,10 @@ public class Main {
             bpanel.setPaused(nowPaused);
             mpanel.setPaused(nowPaused);
             qpanel.setPaused(nowPaused);
+            hpanel.setPaused(nowPaused);
+            rpanel.setPaused(nowPaused);
+            spanel.setPaused(nowPaused);
+            cpanel.setPaused(nowPaused);
             pauseBtn.setText(nowPaused ? "Resume" : "Pause");
         });
     }
@@ -261,7 +281,7 @@ public class Main {
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Theme.BORDER_COLOR, 1),
                 BorderFactory.createEmptyBorder(24, 32, 24, 32)));
-        card.setPreferredSize(new Dimension(1100, 520));
+        card.setPreferredSize(new Dimension(1100, 780));
 
         JLabel heading = new JLabel("Sorting Algorithm Race");
         heading.setForeground(Color.WHITE);
@@ -283,11 +303,15 @@ public class Main {
         card.add(Box.createVerticalStrut(8));
 
         String[][] rows = {
-            {"Bubble Sort", "O(n²)", "Comparison-based, in-place"},
-            {"Merge Sort", "O(n log n)", "Divide & conquer, stable"},
-            {"Quick Sort", "O(n log n)", "Pivot-based, in-place"},};
+            {"Bubble Sort", "O(n²)", "Comparison-based, in-place "},
+            {"Merge Sort", "O(n log n)", "Divide & conquer, stable "},
+            {"Quick Sort", "O(n log n)", "Pivot-based, in-place "},
+            {"Heap Sort", "O(n log n)", "Binary heap, in-place "},
+            {"Radix Sort", "O(nk)", "Non-comparison, digit-based "},
+            {"Shell Sort", "O(n log n)", "Gap-based insertion sort "},
+            {"Counting Sort", "O(n+k)", "Non-comparison, index-based "},};
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 7; i++) {
             JPanel row = buildAlgoRow(i, rows[i][0], rows[i][1], rows[i][2]);
             rowPanels[i] = row;
             card.add(row);
@@ -389,8 +413,8 @@ public class Main {
 
     static void startLiveTimer() {
         liveTimer = new Timer(50, (ActionEvent e) -> {
-            SortingPanel[] panels = {bpanel, mpanel, qpanel};
-            for (int i = 0; i < 3; i++) {
+            SortingPanel[] panels = {bpanel, mpanel, qpanel, hpanel, rpanel, spanel, cpanel};
+            for (int i = 0; i < 7; i++) {
                 if (!finished[i]) {
                     long ms = panels[i].getElapsedMs();
                     timeLabels[i].setText(ms + " ms");
@@ -408,12 +432,12 @@ public class Main {
 
     static void resetFinishState() {
         finishCounter.set(0);
-        finished = new boolean[3];
+        finished = new boolean[7];
     }
 
     static void wireCallbacks() {
-        SortingPanel[] panels = {bpanel, mpanel, qpanel};
-        for (int i = 0; i < 3; i++) {
+        SortingPanel[] panels = {bpanel, mpanel, qpanel, hpanel, rpanel, spanel, cpanel};
+        for (int i = 0; i < 7; i++) {
             final int idx = i;
             panels[i].setOnCompleteCallback(() -> onAlgoFinished(idx, panels[idx]));
         }
@@ -432,7 +456,7 @@ public class Main {
         if (count == 1) {
             markWinner(idx, ms);
         }
-        if (count == 3) {
+        if (count == 7) {
             stopLiveTimer();
         }
     }
@@ -459,7 +483,7 @@ public class Main {
     }
 
     static void resetRowStyles() {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 7; i++) {
             if (rowPanels[i] == null) {
                 continue;
             }
@@ -494,6 +518,10 @@ public class Main {
         bpanel.startSorting();
         mpanel.startSorting();
         qpanel.startSorting();
+        hpanel.startSorting();
+        rpanel.startSorting();
+        spanel.startSorting();
+        cpanel.startSorting();
     }
 
     static JButton makeToolbarBtn(String text) {
