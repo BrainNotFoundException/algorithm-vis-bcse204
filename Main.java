@@ -1,3 +1,4 @@
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,8 +16,8 @@ public class Main {
     static JButton pauseBtn;
 
     static JLabel[] statusLabels = new JLabel[3];
-    static JLabel[] timeLabels   = new JLabel[3];
-    static JPanel[] rowPanels    = new JPanel[3];
+    static JLabel[] timeLabels = new JLabel[3];
+    static JPanel[] rowPanels = new JPanel[3];
 
     static AtomicInteger finishCounter = new AtomicInteger(0);
     static boolean[] finished = new boolean[3];
@@ -26,7 +27,9 @@ public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             int arrSize = showStartupDialog(null);
-            if (arrSize < 1) System.exit(0);
+            if (arrSize < 1) {
+                System.exit(0);
+            }
             buildMainWindow(arrSize);
         });
     }
@@ -65,8 +68,8 @@ public class Main {
         field.setCaretColor(Theme.BUTTON_FG);
         field.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 14));
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Theme.BORDER_COLOR),
-            BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+                BorderFactory.createLineBorder(Theme.BORDER_COLOR),
+                BorderFactory.createEmptyBorder(4, 8, 4, 8)));
         field.setHorizontalAlignment(JTextField.CENTER);
         field.setMaximumSize(new Dimension(120, 32));
         field.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -82,13 +85,28 @@ public class Main {
             void sync() {
                 try {
                     int v = Integer.parseInt(field.getText().trim());
-                    if (v >= 1 && v <= 1500) { slider.setValue(v); errorLabel.setText(" "); }
-                    else errorLabel.setText("Must be between 1 and 1500");
-                } catch (NumberFormatException ex) { errorLabel.setText("Enter a valid integer"); }
+                    if (v >= 1 && v <= 1500) {
+                        slider.setValue(v);
+                        errorLabel.setText(" ");
+                    } else {
+                        errorLabel.setText("Must be between 1 and 1500");
+                    }
+                } catch (NumberFormatException ex) {
+                    errorLabel.setText("Enter a valid integer");
+                }
             }
-            public void insertUpdate(DocumentEvent e)  { sync(); }
-            public void removeUpdate(DocumentEvent e)   { sync(); }
-            public void changedUpdate(DocumentEvent e)  { sync(); }
+
+            public void insertUpdate(DocumentEvent e) {
+                sync();
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                sync();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                sync();
+            }
         });
 
         int[] result = {-1};
@@ -105,16 +123,23 @@ public class Main {
         goBtn.addActionListener(e -> {
             try {
                 int v = Integer.parseInt(field.getText().trim());
-                if (v >= 1 && v <= 1500) { result[0] = v; dialog.dispose(); }
-                else errorLabel.setText("Must be between 1 and 1500");
-            } catch (NumberFormatException ex) { errorLabel.setText("Enter a valid integer"); }
+                if (v >= 1 && v <= 1500) {
+                    result[0] = v;
+                    dialog.dispose();
+                } else {
+                    errorLabel.setText("Must be between 1 and 1500");
+                }
+            } catch (NumberFormatException ex) {
+                errorLabel.setText("Enter a valid integer");
+            }
         });
 
         dialog.getRootPane().setDefaultButton(goBtn);
 
         JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         btnRow.setBackground(Theme.BG_COLOR);
-        btnRow.add(cancelBtn); btnRow.add(goBtn);
+        btnRow.add(cancelBtn);
+        btnRow.add(goBtn);
 
         panel.add(title);
         panel.add(Box.createVerticalStrut(4));
@@ -130,7 +155,7 @@ public class Main {
 
         dialog.getContentPane().add(panel);
         dialog.pack();
-        dialog.setMinimumSize(new Dimension(460, 0));
+        dialog.setMinimumSize(new Dimension(1800, 900));
         dialog.setLocationRelativeTo(owner);
         dialog.setVisible(true);
 
@@ -144,16 +169,15 @@ public class Main {
 
         JFrame frame = new JFrame("Sorting Algorithm Visualizer");
         frame.setLayout(new BorderLayout());
-        frame.setMinimumSize(new Dimension(900, 500));
-        frame.setPreferredSize(new Dimension(1000, 600));
+        frame.setMinimumSize(new Dimension(1800, 900));
 
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
         toolbar.setBackground(Theme.TOOLBAR_BG);
         toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.BORDER_COLOR));
 
-        JButton restartBtn  = makeToolbarBtn("↺  Restart");
+        JButton restartBtn = makeToolbarBtn("↺  Restart");
         JButton newArrayBtn = makeToolbarBtn("⊞  New Array");
-        pauseBtn            = makeToolbarBtn("⏸  Pause");
+        pauseBtn = makeToolbarBtn("⏸  Pause");
 
         toolbar.add(restartBtn);
         toolbar.add(newArrayBtn);
@@ -189,7 +213,7 @@ public class Main {
         JPanel tableCard = buildTableCard();
         centerWrap.add(tableCard);
 
-        frame.add(toolbar,    BorderLayout.NORTH);
+        frame.add(toolbar, BorderLayout.NORTH);
         frame.add(centerWrap, BorderLayout.CENTER);
 
         frame.pack();
@@ -208,7 +232,9 @@ public class Main {
             resetFinishState();
             resetRowStyles();
             clearTimeLabelTexts();
-            bpanel.restart(); mpanel.restart(); qpanel.restart();
+            bpanel.restart();
+            mpanel.restart();
+            qpanel.restart();
             wireCallbacks();
             startAllSorting();
             startLiveTimer();
@@ -216,7 +242,9 @@ public class Main {
 
         newArrayBtn.addActionListener(e -> {
             int size = showStartupDialog(frame);
-            if (size < 1) return;
+            if (size < 1) {
+                return;
+            }
             int[] fresh = ArrGen.generateArray(size);
             pauseBtn.setText("⏸  Pause");
             stopLiveTimer();
@@ -252,13 +280,13 @@ public class Main {
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(Theme.CARD_BG);
         card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Theme.BORDER_COLOR, 1),
-            BorderFactory.createEmptyBorder(24, 32, 24, 32)));
-        card.setPreferredSize(new Dimension(780, 400));
+                BorderFactory.createLineBorder(Theme.BORDER_COLOR, 1),
+                BorderFactory.createEmptyBorder(24, 32, 24, 32)));
+        card.setPreferredSize(new Dimension(1100, 520));
 
         JLabel heading = new JLabel("Sorting Algorithm Race");
         heading.setForeground(Color.WHITE);
-        heading.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 20));
+        heading.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 26));
         heading.setAlignmentX(Component.LEFT_ALIGNMENT);
         card.add(heading);
         card.add(Box.createVerticalStrut(6));
@@ -276,16 +304,17 @@ public class Main {
         card.add(Box.createVerticalStrut(8));
 
         String[][] rows = {
-            {"Bubble Sort", "O(n²)",       "Comparison-based, in-place"},
-            {"Merge Sort",  "O(n log n)", "Divide & conquer, stable"},
-            {"Quick Sort",  "O(n log n)", "Pivot-based, in-place"},
-        };
+            {"Bubble Sort", "O(n²)", "Comparison-based, in-place"},
+            {"Merge Sort", "O(n log n)", "Divide & conquer, stable"},
+            {"Quick Sort", "O(n log n)", "Pivot-based, in-place"},};
 
         for (int i = 0; i < 3; i++) {
             JPanel row = buildAlgoRow(i, rows[i][0], rows[i][1], rows[i][2]);
             rowPanels[i] = row;
             card.add(row);
-            if (i < 2) card.add(Box.createVerticalStrut(6));
+            if (i < 2) {
+                card.add(Box.createVerticalStrut(6));
+            }
         }
 
         card.add(Box.createVerticalStrut(16));
@@ -295,9 +324,9 @@ public class Main {
         JPanel legend = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
         legend.setBackground(Theme.CARD_BG);
         legend.setAlignmentX(Component.LEFT_ALIGNMENT);
-        legend.add(legendDot(Theme.TIME_COLOR,    "Running"));
-        legend.add(legendDot(Theme.WINNER_COLOR,  "Winner 🏆"));
-        legend.add(legendDot(new Color(160,160,160), "Completed"));
+        legend.add(legendDot(Theme.TIME_COLOR, "Running"));
+        legend.add(legendDot(Theme.WINNER_COLOR, "Winner 🏆"));
+        legend.add(legendDot(new Color(160, 160, 160), "Completed"));
         card.add(legend);
 
         return card;
@@ -322,8 +351,8 @@ public class Main {
         row.setBackground(Theme.CARD_BG);
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
         row.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(45, 45, 45), 1),
-            BorderFactory.createEmptyBorder(12, 14, 12, 14)));
+                BorderFactory.createLineBorder(new Color(45, 45, 45), 1),
+                BorderFactory.createEmptyBorder(18, 20, 18, 20)));
 
         JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         namePanel.setBackground(row.getBackground());
@@ -334,21 +363,21 @@ public class Main {
 
         JLabel nameLbl = new JLabel(name);
         nameLbl.setForeground(Color.WHITE);
-        nameLbl.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 14));
+        nameLbl.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 18));
         namePanel.add(dot);
         namePanel.add(nameLbl);
 
         JLabel complexityLbl = new JLabel(complexity);
         complexityLbl.setForeground(new Color(180, 140, 255));
-        complexityLbl.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 13));
+        complexityLbl.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 16));
 
         JLabel descLbl = new JLabel(desc);
         descLbl.setForeground(new Color(130, 130, 130));
-        descLbl.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 12));
+        descLbl.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 14));
 
         JLabel timeLbl = new JLabel("—");
         timeLbl.setForeground(Theme.TIME_COLOR);
-        timeLbl.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 14));
+        timeLbl.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 18));
         timeLabels[idx] = timeLbl;
 
         row.add(namePanel);
@@ -374,7 +403,8 @@ public class Main {
         JLabel lbl = new JLabel(label);
         lbl.setForeground(new Color(130, 130, 130));
         lbl.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 11));
-        p.add(dot); p.add(lbl);
+        p.add(dot);
+        p.add(lbl);
         return p;
     }
 
@@ -392,7 +422,9 @@ public class Main {
     }
 
     static void stopLiveTimer() {
-        if (liveTimer != null) liveTimer.stop();
+        if (liveTimer != null) {
+            liveTimer.stop();
+        }
     }
 
     static void resetFinishState() {
@@ -431,33 +463,39 @@ public class Main {
         for (Component c : rowPanels[idx].getComponents()) {
             c.setBackground(Theme.WINNER_BG);
             if (c instanceof JPanel) {
-                for (Component cc : ((JPanel) c).getComponents()) cc.setBackground(Theme.WINNER_BG);
+                for (Component cc : ((JPanel) c).getComponents()) {
+                    cc.setBackground(Theme.WINNER_BG);
+                }
             }
         }
         rowPanels[idx].setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Theme.WINNER_COLOR, 2),
-            BorderFactory.createEmptyBorder(12, 14, 12, 14)));
+                BorderFactory.createLineBorder(Theme.WINNER_COLOR, 2),
+                BorderFactory.createEmptyBorder(12, 14, 12, 14)));
 
         statusLabels[idx].setForeground(Theme.WINNER_COLOR);
         statusLabels[idx].setText("★");
         timeLabels[idx].setForeground(Theme.WINNER_COLOR);
         timeLabels[idx].setText("🏆 " + ms + " ms");
-        timeLabels[idx].setFont(new Font("JetBrainsMono NFP", Font.BOLD, 14));
+        timeLabels[idx].setFont(new Font("JetBrainsMono NFP", Font.BOLD, 18));
     }
 
     static void resetRowStyles() {
         for (int i = 0; i < 3; i++) {
-            if (rowPanels[i] == null) continue;
+            if (rowPanels[i] == null) {
+                continue;
+            }
             rowPanels[i].setBackground(Theme.CARD_BG);
             for (Component c : rowPanels[i].getComponents()) {
                 c.setBackground(Theme.CARD_BG);
                 if (c instanceof JPanel) {
-                    for (Component cc : ((JPanel) c).getComponents()) cc.setBackground(Theme.CARD_BG);
+                    for (Component cc : ((JPanel) c).getComponents()) {
+                        cc.setBackground(Theme.CARD_BG);
+                    }
                 }
             }
             rowPanels[i].setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(45, 45, 45), 1),
-                BorderFactory.createEmptyBorder(12, 14, 12, 14)));
+                    BorderFactory.createLineBorder(new Color(45, 45, 45), 1),
+                    BorderFactory.createEmptyBorder(12, 14, 12, 14)));
             statusLabels[i].setText("●");
             statusLabels[i].setForeground(Theme.TIME_COLOR);
             timeLabels[i].setForeground(Theme.TIME_COLOR);
@@ -466,7 +504,11 @@ public class Main {
     }
 
     static void clearTimeLabelTexts() {
-        for (JLabel lbl : timeLabels) if (lbl != null) lbl.setText("—");
+        for (JLabel lbl : timeLabels) {
+            if (lbl != null) {
+                lbl.setText("—");
+            }
+        }
     }
 
     static void startAllSorting() {
@@ -482,8 +524,8 @@ public class Main {
         btn.setForeground(Theme.BUTTON_FG);
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Theme.BORDER_COLOR),
-            BorderFactory.createEmptyBorder(4, 12, 4, 12)));
+                BorderFactory.createLineBorder(Theme.BORDER_COLOR),
+                BorderFactory.createEmptyBorder(4, 12, 4, 12)));
         return btn;
     }
 
