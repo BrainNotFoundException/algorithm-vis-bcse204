@@ -198,9 +198,6 @@ public class Main {
         rpanel = new RadixSortPanel(arr.clone());
         spanel = new ShellSortPanel(arr.clone());
         cpanel = new CountingSortPanel(arr.clone());
-        bpanel.setVisible(false);
-        mpanel.setVisible(false);
-        qpanel.setVisible(false);
 
         JPanel centerWrap = new JPanel(new GridBagLayout());
         centerWrap.setBackground(Theme.BG_COLOR);
