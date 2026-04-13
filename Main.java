@@ -49,16 +49,16 @@ public class Main {
         title.setFont(new Font("JetBrainsMono NFP", Font.BOLD, 16));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("Choose an array size between 1 and 1500");
+        JLabel subtitle = new JLabel("Choose an array size between 1 and 1,000,000");
         subtitle.setForeground(Theme.TIME_COLOR);
         subtitle.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 12));
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JSlider slider = new JSlider(1, 1500, 300);
+        JSlider slider = new JSlider(1, 1000000, 300);
         slider.setBackground(Theme.BG_COLOR);
         slider.setForeground(Theme.BUTTON_FG);
-        slider.setMajorTickSpacing(500);
-        slider.setMinorTickSpacing(100);
+        slider.setMajorTickSpacing(100000);
+        slider.setMinorTickSpacing(10000);
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);
 
@@ -85,25 +85,28 @@ public class Main {
             void sync() {
                 try {
                     int v = Integer.parseInt(field.getText().trim());
-                    if (v >= 1 && v <= 1500) {
+                    if (v >= 1 && v <= 1000000) {
                         slider.setValue(v);
                         errorLabel.setText(" ");
                     } else {
-                        errorLabel.setText("Must be between 1 and 1500");
+                        errorLabel.setText("Must be between 1 and 1,000,000");
                     }
                 } catch (NumberFormatException ex) {
                     errorLabel.setText("Enter a valid integer");
                 }
             }
 
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 sync();
             }
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 sync();
             }
 
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 sync();
             }
@@ -123,11 +126,11 @@ public class Main {
         goBtn.addActionListener(e -> {
             try {
                 int v = Integer.parseInt(field.getText().trim());
-                if (v >= 1 && v <= 1500) {
+                if (v >= 1 && v <= 1000000) {
                     result[0] = v;
                     dialog.dispose();
                 } else {
-                    errorLabel.setText("Must be between 1 and 1500");
+                    errorLabel.setText("Must be between 1 and 1,000,000");
                 }
             } catch (NumberFormatException ex) {
                 errorLabel.setText("Enter a valid integer");
@@ -175,29 +178,13 @@ public class Main {
         toolbar.setBackground(Theme.TOOLBAR_BG);
         toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.BORDER_COLOR));
 
-        JButton restartBtn = makeToolbarBtn("↺  Restart");
-        JButton newArrayBtn = makeToolbarBtn("⊞  New Array");
-        pauseBtn = makeToolbarBtn("⏸  Pause");
+        JButton restartBtn = makeToolbarBtn("Restart");
+        JButton newArrayBtn = makeToolbarBtn("New Array");
+        pauseBtn = makeToolbarBtn("Pause");
 
         toolbar.add(restartBtn);
         toolbar.add(newArrayBtn);
         toolbar.add(pauseBtn);
-        toolbar.add(Box.createHorizontalStrut(20));
-
-        JLabel speedLabel = new JLabel("Swap Delay:");
-        speedLabel.setForeground(new Color(160, 160, 160));
-        speedLabel.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 12));
-        toolbar.add(speedLabel);
-
-        JSlider speedSlider = new JSlider(0, 50, 5);
-        speedSlider.setBackground(Theme.TOOLBAR_BG);
-        speedSlider.setPreferredSize(new Dimension(160, 28));
-        toolbar.add(speedSlider);
-
-        JLabel speedVal = new JLabel("5 ms");
-        speedVal.setForeground(Theme.TIME_COLOR);
-        speedVal.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 12));
-        toolbar.add(speedVal);
 
         int[] arr = ArrGen.generateArray(arrSize);
         bpanel = new BubbleSortPanel(arr.clone());
@@ -227,7 +214,7 @@ public class Main {
         startLiveTimer();
 
         restartBtn.addActionListener(e -> {
-            pauseBtn.setText("⏸  Pause");
+            pauseBtn.setText("Pause");
             stopLiveTimer();
             resetFinishState();
             resetRowStyles();
@@ -246,7 +233,7 @@ public class Main {
                 return;
             }
             int[] fresh = ArrGen.generateArray(size);
-            pauseBtn.setText("⏸  Pause");
+            pauseBtn.setText("Pause");
             stopLiveTimer();
             resetFinishState();
             resetRowStyles();
@@ -263,15 +250,7 @@ public class Main {
             bpanel.setPaused(nowPaused);
             mpanel.setPaused(nowPaused);
             qpanel.setPaused(nowPaused);
-            pauseBtn.setText(nowPaused ? "▶  Resume" : "⏸  Pause");
-        });
-
-        speedSlider.addChangeListener(e -> {
-            int delay = speedSlider.getValue();
-            speedVal.setText(delay + " ms");
-            bpanel.setDelay(delay);
-            mpanel.setDelay(delay);
-            qpanel.setDelay(delay);
+            pauseBtn.setText(nowPaused ? "Resume" : "Pause");
         });
     }
 
@@ -291,7 +270,7 @@ public class Main {
         card.add(heading);
         card.add(Box.createVerticalStrut(6));
 
-        JLabel subheading = new JLabel("Live runtime comparison — fastest finisher wins");
+        JLabel subheading = new JLabel("Live runtime comparison");
         subheading.setForeground(new Color(120, 120, 120));
         subheading.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 12));
         subheading.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -325,7 +304,7 @@ public class Main {
         legend.setBackground(Theme.CARD_BG);
         legend.setAlignmentX(Component.LEFT_ALIGNMENT);
         legend.add(legendDot(Theme.TIME_COLOR, "Running"));
-        legend.add(legendDot(Theme.WINNER_COLOR, "Winner 🏆"));
+        legend.add(legendDot(Theme.WINNER_COLOR, "Winner"));
         legend.add(legendDot(new Color(160, 160, 160), "Completed"));
         card.add(legend);
 
@@ -356,7 +335,7 @@ public class Main {
 
         JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         namePanel.setBackground(row.getBackground());
-        JLabel dot = new JLabel("●");
+        JLabel dot = new JLabel("*");
         dot.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 10));
         dot.setForeground(Theme.TIME_COLOR);
         statusLabels[idx] = dot;
@@ -397,7 +376,7 @@ public class Main {
     static JPanel legendDot(Color color, String label) {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         p.setBackground(Theme.CARD_BG);
-        JLabel dot = new JLabel("●");
+        JLabel dot = new JLabel("*");
         dot.setForeground(color);
         dot.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 10));
         JLabel lbl = new JLabel(label);
@@ -447,7 +426,7 @@ public class Main {
         timeLabels[idx].setText(ms + " ms");
         timeLabels[idx].setForeground(new Color(160, 160, 160));
         statusLabels[idx].setForeground(new Color(160, 160, 160));
-        statusLabels[idx].setText("✓");
+        statusLabels[idx].setText("done");
 
         int count = finishCounter.incrementAndGet();
         if (count == 1) {
@@ -462,8 +441,8 @@ public class Main {
         rowPanels[idx].setBackground(Theme.WINNER_BG);
         for (Component c : rowPanels[idx].getComponents()) {
             c.setBackground(Theme.WINNER_BG);
-            if (c instanceof JPanel) {
-                for (Component cc : ((JPanel) c).getComponents()) {
+            if (c instanceof JPanel jPanel) {
+                for (Component cc : jPanel.getComponents()) {
                     cc.setBackground(Theme.WINNER_BG);
                 }
             }
@@ -473,9 +452,9 @@ public class Main {
                 BorderFactory.createEmptyBorder(12, 14, 12, 14)));
 
         statusLabels[idx].setForeground(Theme.WINNER_COLOR);
-        statusLabels[idx].setText("★");
+        statusLabels[idx].setText("WIN");
         timeLabels[idx].setForeground(Theme.WINNER_COLOR);
-        timeLabels[idx].setText("🏆 " + ms + " ms");
+        timeLabels[idx].setText(ms + " ms");
         timeLabels[idx].setFont(new Font("JetBrainsMono NFP", Font.BOLD, 18));
     }
 
@@ -487,8 +466,8 @@ public class Main {
             rowPanels[i].setBackground(Theme.CARD_BG);
             for (Component c : rowPanels[i].getComponents()) {
                 c.setBackground(Theme.CARD_BG);
-                if (c instanceof JPanel) {
-                    for (Component cc : ((JPanel) c).getComponents()) {
+                if (c instanceof JPanel jPanel) {
+                    for (Component cc : jPanel.getComponents()) {
                         cc.setBackground(Theme.CARD_BG);
                     }
                 }
@@ -496,10 +475,10 @@ public class Main {
             rowPanels[i].setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(45, 45, 45), 1),
                     BorderFactory.createEmptyBorder(12, 14, 12, 14)));
-            statusLabels[i].setText("●");
+            statusLabels[i].setText("*");
             statusLabels[i].setForeground(Theme.TIME_COLOR);
             timeLabels[i].setForeground(Theme.TIME_COLOR);
-            timeLabels[i].setFont(new Font("JetBrainsMono NFP", Font.BOLD, 14));
+            timeLabels[i].setFont(new Font("JetBrainsMono NFP", Font.BOLD, 18));
         }
     }
 
@@ -528,5 +507,4 @@ public class Main {
                 BorderFactory.createEmptyBorder(4, 12, 4, 12)));
         return btn;
     }
-
 }
