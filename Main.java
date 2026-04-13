@@ -30,15 +30,15 @@ public class Main {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            int arrSize = showStartupDialog(null);
-            if (arrSize < 1) {
+            int[] config = showStartupDialog(null);
+            if (config[0] < 1) {
                 System.exit(0);
             }
-            buildMainWindow(arrSize);
+            buildMainWindow(config[0], config[1], config[2]);
         });
     }
 
-    static int showStartupDialog(JFrame owner) {
+    static int[] showStartupDialog(JFrame owner) {
         JDialog dialog = new JDialog(owner, "Array Size", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setResizable(false);
@@ -78,6 +78,40 @@ public class Main {
         field.setMaximumSize(new Dimension(120, 32));
         field.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        JTextField minField = new JTextField("1", 6);
+        minField.setBackground(Theme.FIELD_BG);
+        minField.setForeground(Theme.BUTTON_FG);
+        minField.setCaretColor(Theme.BUTTON_FG);
+        minField.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 14));
+        minField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Theme.BORDER_COLOR),
+                BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+        minField.setHorizontalAlignment(JTextField.CENTER);
+        minField.setMaximumSize(new Dimension(120, 32));
+        minField.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JTextField maxField = new JTextField("1000000", 6);
+        maxField.setBackground(Theme.FIELD_BG);
+        maxField.setForeground(Theme.BUTTON_FG);
+        maxField.setCaretColor(Theme.BUTTON_FG);
+        maxField.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 14));
+        maxField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Theme.BORDER_COLOR),
+                BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+        maxField.setHorizontalAlignment(JTextField.CENTER);
+        maxField.setMaximumSize(new Dimension(120, 32));
+        maxField.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel minLabel = new JLabel("Min value:");
+        minLabel.setForeground(Theme.BUTTON_FG);
+        minLabel.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 12));
+        minLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel maxLabel = new JLabel("Max value:");
+        maxLabel.setForeground(Theme.BUTTON_FG);
+        maxLabel.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 12));
+        maxLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         JLabel errorLabel = new JLabel(" ");
         errorLabel.setForeground(Theme.ERROR_FG);
         errorLabel.setFont(new Font("JetBrainsMono NFP", Font.PLAIN, 11));
@@ -90,7 +124,7 @@ public class Main {
                 try {
                     int v = Integer.parseInt(field.getText().trim());
                     if (v >= 1 && v <= 1000000) {
-                        slider.setValue(v);
+                        SwingUtilities.invokeLater(() -> slider.setValue(v));
                         errorLabel.setText(" ");
                     } else {
                         errorLabel.setText("Must be between 1 and 1,000,000");
@@ -116,7 +150,7 @@ public class Main {
             }
         });
 
-        int[] result = {-1};
+        int[] result = {-1, 1, 1000000};
 
         JButton cancelBtn = new JButton("Cancel");
         cancelBtn.setBackground(Theme.BUTTON_BG);
@@ -130,14 +164,18 @@ public class Main {
         goBtn.addActionListener(e -> {
             try {
                 int v = Integer.parseInt(field.getText().trim());
-                if (v >= 1 && v <= 1000000) {
+                int mn = Integer.parseInt(minField.getText().trim());
+                int mx = Integer.parseInt(maxField.getText().trim());
+                if (v >= 1 && v <= 1000000 && mn >= 1 && mx > mn) {
                     result[0] = v;
+                    result[1] = mn;
+                    result[2] = mx;
                     dialog.dispose();
                 } else {
-                    errorLabel.setText("Must be between 1 and 1,000,000");
+                    errorLabel.setText("Check values — max must be greater than min");
                 }
             } catch (NumberFormatException ex) {
-                errorLabel.setText("Enter a valid integer");
+                errorLabel.setText("Enter valid integers");
             }
         });
 
@@ -155,6 +193,14 @@ public class Main {
         panel.add(slider);
         panel.add(Box.createVerticalStrut(10));
         panel.add(field);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(minLabel);
+        panel.add(Box.createVerticalStrut(4));
+        panel.add(minField);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(maxLabel);
+        panel.add(Box.createVerticalStrut(4));
+        panel.add(maxField);
         panel.add(Box.createVerticalStrut(4));
         panel.add(errorLabel);
         panel.add(Box.createVerticalStrut(14));
@@ -166,10 +212,10 @@ public class Main {
         dialog.setLocationRelativeTo(owner);
         dialog.setVisible(true);
 
-        return result[0];
+        return result;
     }
 
-    static void buildMainWindow(int arrSize) {
+    static void buildMainWindow(int arrSize, int minVal, int maxVal) {
         UIManager.put("Panel.background", Theme.BG_COLOR);
         UIManager.put("Button.background", Theme.BUTTON_BG);
         UIManager.put("Button.foreground", Theme.BUTTON_FG);
@@ -190,7 +236,7 @@ public class Main {
         toolbar.add(newArrayBtn);
         toolbar.add(pauseBtn);
 
-        int[] arr = ArrGen.generateArray(arrSize);
+        int[] arr = ArrGen.generateArray(arrSize, minVal, maxVal);
         bpanel = new BubbleSortPanel(arr.clone());
         mpanel = new MergeSortPanel(arr.clone());
         qpanel = new QuickSortPanel(arr.clone());
@@ -237,11 +283,11 @@ public class Main {
         });
 
         newArrayBtn.addActionListener(e -> {
-            int size = showStartupDialog(frame);
-            if (size < 1) {
+            int[] config = showStartupDialog(frame);
+            if (config[0] < 1) {
                 return;
             }
-            int[] fresh = ArrGen.generateArray(size);
+            int[] fresh = ArrGen.generateArray(config[0], config[1], config[2]);
             pauseBtn.setText("Pause");
             stopLiveTimer();
             resetFinishState();
@@ -312,7 +358,7 @@ public class Main {
             JPanel row = buildAlgoRow(i, rows[i][0], rows[i][1], rows[i][2]);
             rowPanels[i] = row;
             card.add(row);
-            if (i < 2) {
+            if (i < 6) {
                 card.add(Box.createVerticalStrut(6));
             }
         }
