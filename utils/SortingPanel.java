@@ -18,6 +18,8 @@ public abstract class SortingPanel extends JPanel {
     private volatile boolean stopRequested = false;
     private Thread sortThread;
 
+    private Runnable onCompleteCallback;
+
     public void setTimeLabel(JLabel timeLabel) {
         this.timeLabel = timeLabel;
     }
@@ -26,18 +28,27 @@ public abstract class SortingPanel extends JPanel {
         this.delayMs = ms;
     }
 
+    public void setOnCompleteCallback(Runnable callback) {
+        this.onCompleteCallback = callback;
+    }
+
+    public long getElapsedMs() {
+        if (startTime == 0) return 0;
+        long timeSpentPaused = pausedTime;
+        if (paused && pauseStart != 0) {
+            timeSpentPaused += System.nanoTime() - pauseStart;
+        }
+        return (System.nanoTime() - startTime - timeSpentPaused) / 1_000_000;
+    }
+
+    public long getFinalRuntime() {
+        return runTime - pausedTime / 1_000_000;
+    }
+
     void updateTimeLabel() {
         if (timeLabel != null) {
-
-            long timeSpentPaused = pausedTime;
-            if (paused && pauseStart != 0) {
-                timeSpentPaused += System.nanoTime() - pauseStart;
-            }
-            long updateTime = (System.nanoTime() - startTime - timeSpentPaused) / 1000000;
-
-            SwingUtilities.invokeLater(() -> {
-                timeLabel.setText("Time: " + updateTime + "ms");
-            });
+            long elapsed = getElapsedMs();
+            SwingUtilities.invokeLater(() -> timeLabel.setText("⏱ " + elapsed + " ms"));
         }
     }
 
@@ -49,9 +60,7 @@ public abstract class SortingPanel extends JPanel {
         long target = System.currentTimeMillis() + delayMs;
         try {
             while (System.currentTimeMillis() < target || paused) {
-                if (stopRequested) {
-                    return;
-                }
+                if (stopRequested) return;
                 Thread.sleep(paused ? 50 : 1);
             }
         } catch (InterruptedException e) {
@@ -66,21 +75,19 @@ public abstract class SortingPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        int width = Math.max(getWidth() / arr.length, 1);
-        for (int i = 0; i < arr.length; i++) {
-            g.fillRect(i * width, getHeight() - arr[i], width, arr[i]);
-        }
     }
 
     public void startSorting() {
         stopRequested = false;
         paused = false;
+        pausedTime = 0;
+        pauseStart = 0;
         sortThread = new Thread(() -> {
             startTime = System.nanoTime();
             sort();
             if (!stopRequested) {
                 endTime = System.nanoTime();
-                runTime = (endTime - startTime) / 1000000;
+                runTime = (endTime - startTime) / 1_000_000;
                 onSortingCompleted();
             }
         });
@@ -93,48 +100,40 @@ public abstract class SortingPanel extends JPanel {
         paused = false;
         if (sortThread != null) {
             sortThread.interrupt();
-            try {
-                sortThread.join(200);
-            } catch (InterruptedException ignored) {
-            }
+            try { sortThread.join(200); } catch (InterruptedException ignored) {}
         }
         arr = originalArr.clone();
+        startTime = 0;
+        runTime = 0;
+        pausedTime = 0;
+        pauseStart = 0;
         if (timeLabel != null) {
-            SwingUtilities.invokeLater(() -> timeLabel.setText("Time Taken"));
+            SwingUtilities.invokeLater(() -> timeLabel.setText("—"));
         }
         repaint();
     }
 
     public void setPaused(boolean p) {
-
-        if (p && !paused) {
-            pauseStart = System.nanoTime();
-        }
-
-        if (!p && paused) {
-            pausedTime += System.nanoTime() - pauseStart;
-        }
-
+        if (p && !paused) pauseStart = System.nanoTime();
+        if (!p && paused) pausedTime += System.nanoTime() - pauseStart;
         this.paused = p;
     }
 
-    public boolean isPaused() {
-        return paused;
-    }
+    public boolean isPaused() { return paused; }
 
     void onSortingCompleted() {
+        long finalMs = getFinalRuntime();
         if (timeLabel != null) {
-            SwingUtilities.invokeLater(()
-                    -> {
-                timeLabel.setText("Total Time: " + (runTime - pausedTime/1000000) + "ms");
-            });
+            SwingUtilities.invokeLater(() -> timeLabel.setText("✓ " + finalMs + " ms"));
+        }
+        if (onCompleteCallback != null) {
+            SwingUtilities.invokeLater(onCompleteCallback);
         }
     }
 
     public SortingPanel(int[] arr) {
         this.arr = arr;
         this.originalArr = arr.clone();
-
         this.pausedTime = 0;
     }
 

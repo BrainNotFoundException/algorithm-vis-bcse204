@@ -3,17 +3,19 @@ package themes;
 import java.awt.Color;
 
 public class Theme {
-    
-    public static final Color BG_COLOR = new Color(18, 18, 18);
-    public static final Color BUTTON_BG = new Color(50, 50, 50);
-    public static final Color BUTTON_FG = Color.WHITE;
+
+    public static final Color BG_COLOR    = new Color(18, 18, 18);
+    public static final Color BUTTON_BG   = new Color(50, 50, 50);
+    public static final Color BUTTON_FG   = Color.WHITE;
     public static final Color BORDER_COLOR = Color.DARK_GRAY;
 
-    public static final Color TIME_COLOR = Color.GREEN;
+    public static final Color TIME_COLOR  = new Color(80, 200, 120);
 
-    public static final Color FIELD_BG = new Color(40, 40, 40);
-    public static final Color ERROR_FG = new Color(220, 80, 60);
-    public static final Color TOOLBAR_BG = new Color(25, 25, 25);
-    public static final Color CARD_BG = new Color(30, 30, 30);
+    public static final Color FIELD_BG    = new Color(40, 40, 40);
+    public static final Color ERROR_FG    = new Color(220, 80, 60);
+    public static final Color TOOLBAR_BG  = new Color(25, 25, 25);
+    public static final Color CARD_BG     = new Color(30, 30, 30);
 
+    public static final Color WINNER_COLOR = new Color(255, 200, 40);
+    public static final Color WINNER_BG    = new Color(40, 36, 20);
 }
