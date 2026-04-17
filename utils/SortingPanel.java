@@ -18,6 +18,9 @@ public abstract class SortingPanel extends JPanel {
     //private volatile boolean stopRequested = false;
     private Thread sortThread;
 
+    volatile int ver = 0;
+    volatile int cVer = -1;
+
     private Runnable onCompleteCallback;
 
     public void setTimeLabel(JLabel timeLabel) {
@@ -81,7 +84,7 @@ public abstract class SortingPanel extends JPanel {
     volatile boolean stopped = false;
 
     protected boolean isStopped() {
-        return stopped;
+        return cVer != ver;
     }
 
     @Override
@@ -90,14 +93,16 @@ public abstract class SortingPanel extends JPanel {
     }
 
     public void startSorting() {
-        stopped = false;
+        ver++;
+        final int curVer = ver;
         paused = false;
         pausedTime = 0;
         pauseStart = 0;
         sortThread = new Thread(() -> {
+            cVer = curVer;
             startTime = System.nanoTime();
             sort();
-            if (!stopped) {
+            if (!isStopped()) {
                 endTime = System.nanoTime();
                 runTime = (endTime - startTime) / 1_000_000;
                 onSortingCompleted();
@@ -108,7 +113,8 @@ public abstract class SortingPanel extends JPanel {
     }
 
     public void restart() {
-        stopped = true;
+        //stopped = true;
+        ver++;
         paused = false;
         arr = originalArr.clone();
         startTime = 0;
@@ -150,7 +156,8 @@ public abstract class SortingPanel extends JPanel {
     }
 
     public void resetAndStart(int[] newArr) {
-        stopped = true;
+        //stopped = true;
+        ver++;
         paused = false;
         arr = newArr.clone();
         originalArr = newArr.clone();
