@@ -9,7 +9,7 @@ public interface ArrGen {
         Random rand = new Random();
 
         for (int i = 0; i < size; i++) {
-            arr[i] = rand.nextInt(max - min) + min + 1;
+            arr[i] = rand.nextInt(max - min + 1) + min;
         }
 
         return arr;
