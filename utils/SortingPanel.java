@@ -15,7 +15,7 @@ public abstract class SortingPanel extends JPanel {
 
     private volatile boolean paused = false;
     // private volatile int delayMs = 5;
-    private volatile boolean stopRequested = false;
+    //private volatile boolean stopRequested = false;
     private Thread sortThread;
 
     private Runnable onCompleteCallback;
@@ -68,7 +68,7 @@ public abstract class SortingPanel extends JPanel {
         // }
         try {
             while (paused) {
-                if (stopRequested) {
+                if (stopped) {
                     return;
                 }
                 Thread.sleep(50);
@@ -78,8 +78,10 @@ public abstract class SortingPanel extends JPanel {
         }
     }
 
+    volatile boolean stopped = false;
+
     protected boolean isStopped() {
-        return stopRequested;
+        return stopped;
     }
 
     @Override
@@ -88,14 +90,14 @@ public abstract class SortingPanel extends JPanel {
     }
 
     public void startSorting() {
-        stopRequested = false;
+        stopped = false;
         paused = false;
         pausedTime = 0;
         pauseStart = 0;
         sortThread = new Thread(() -> {
             startTime = System.nanoTime();
             sort();
-            if (!stopRequested) {
+            if (!stopped) {
                 endTime = System.nanoTime();
                 runTime = (endTime - startTime) / 1_000_000;
                 onSortingCompleted();
@@ -106,24 +108,15 @@ public abstract class SortingPanel extends JPanel {
     }
 
     public void restart() {
-        stopRequested = true;
+        stopped = true;
         paused = false;
-        if (sortThread != null) {
-            sortThread.interrupt();
-            try {
-                sortThread.join(200);
-            } catch (InterruptedException ignored) {
-            }
-        }
         arr = originalArr.clone();
         startTime = 0;
         runTime = 0;
         pausedTime = 0;
         pauseStart = 0;
-        if (timeLabel != null) {
-            SwingUtilities.invokeLater(() -> timeLabel.setText("—"));
-        }
         repaint();
+        startSorting();
     }
 
     public void setPaused(boolean p) {
@@ -157,9 +150,14 @@ public abstract class SortingPanel extends JPanel {
     }
 
     public void resetAndStart(int[] newArr) {
-        restart();
-        this.arr = newArr.clone();
-        this.originalArr = newArr.clone();
+        stopped = true;
+        paused = false;
+        arr = newArr.clone();
+        originalArr = newArr.clone();
+        startTime = 0;
+        runTime = 0;
+        pausedTime = 0;
+        pauseStart = 0;
         repaint();
         startSorting();
     }
