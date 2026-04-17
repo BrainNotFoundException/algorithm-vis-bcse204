@@ -95,11 +95,13 @@ public abstract class SortingPanel extends JPanel {
     public void startSorting() {
         ver++;
         final int curVer = ver;
+        final int[] thisArr = arr.clone();
         paused = false;
         pausedTime = 0;
         pauseStart = 0;
         sortThread = new Thread(() -> {
             cVer = curVer;
+            arr = thisArr;
             startTime = System.nanoTime();
             sort();
             if (!isStopped()) {
@@ -109,6 +111,7 @@ public abstract class SortingPanel extends JPanel {
             }
         });
         sortThread.setDaemon(true);
+        sortThread.setPriority(Thread.MIN_PRIORITY);
         sortThread.start();
     }
 
@@ -122,6 +125,7 @@ public abstract class SortingPanel extends JPanel {
         pausedTime = 0;
         pauseStart = 0;
         repaint();
+        //Thread.yield();
         startSorting();
     }
 
@@ -166,6 +170,7 @@ public abstract class SortingPanel extends JPanel {
         pausedTime = 0;
         pauseStart = 0;
         repaint();
+        //Thread.yield();
         startSorting();
     }
 }
